@@ -1,5 +1,5 @@
 library(tidyverse)
-library(shinymaterial)
+
 library(googlesheets)
 library(magrittr)
 
@@ -74,7 +74,9 @@ g <- list(
 
 plot_geo(mass_shootings, locationmode = 'USA-states', sizes = c(8, 250)) %>%
         add_markers(
-                x = ~longitude, y = ~latitude, size = ~total_victims, color = ~gender, hoverinfo = ~paste(mass_shootings$case, "<br />", mass_shootings$location)
+                x = ~longitude, y = ~latitude, size = ~total_victims, color = ~gender, hoverinfo = "text",
+                text = ~paste(mass_shootings$case, paste0("<b>","<i>",gender,"<i>", "      
+                                                        </b>"), "Location:", location, total_victims, fatalities, injured)
         ) %>%
         layout(title = 'Mass shootings 1982 - 2018<br>(Click legend to toggle)', geo = g)
 
