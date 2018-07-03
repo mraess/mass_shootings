@@ -6,6 +6,10 @@ library(magrittr)
 
 filter <- dplyr::filter
 
+as.Date <- base::as.Date
+
+
+
 # register googlesheet from "Mother Jones - Mass Shootings Database 1982 - 2018
 
 gs_mass_shootings <- gs_url(x = "https://docs.google.com/spreadsheets/d/1b9o6uDO18sLxBqPwl_Gh9bnhW-ev_dABH83M5Vb5L8o/edit#gid=0")
@@ -25,9 +29,11 @@ glimpse(mass_shootings)
 
 mass_shootings %<>% separate(col = location, into = c("city", "state"), sep = ", ", remove = FALSE)
 
-# Create data variable from date
+# Create data variable from date - some dates have 3/3/xx other have 3/3/xxxx
 
-mass_shootings %<>% mutate(date = as.Date(date, format = "%m/%d/%y"))
+mass_shootings %<>% mutate(date = str_replace_all(date, pattern = "([0-9]{1,2}\\/[0-9]{1,2})\\/([0-9]{2}$)", replacement = "\\1\\/20\\2"))
+
+mass_shootings %<>% mutate(date = as.Date(date, format = "%m/%d/%Y"))
 
 ## Change variable names with spaces or other symbols to underscore
 
@@ -48,4 +54,4 @@ mass_shootings %<>% mutate(prior_signs_of_mental_health_issues = str_replace_all
 
 
 
-
+mass_shootings$date
