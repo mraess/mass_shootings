@@ -31,7 +31,7 @@ mass_rolling_mean <- mass_shootings %>%
                 # mean args
                 na.rm      = TRUE,
                 # tq_mutate args
-                col_rename = "mean_28"
+                col_rename = "roll_mean"
         )
 
 mass_rolling_mean
@@ -41,7 +41,7 @@ mass_rolling_mean %>%
         ggplot(aes(x = date, y = total_victims)) +
         # Data
         geom_point(alpha = 0.8, color = ifelse(mass_rolling_mean$total_victims < 200,"#E68415", "#C94024")) +
-        geom_line(aes(y = mean_28), color = palette_light()[[1]], size = 1) +
+        geom_line(aes(y = roll_mean), color = palette_light()[[1]], size = 1) +
         scale_x_date(date_breaks = "2 years", date_labels =  "%Y") +
         theme_tufte() +
         theme(plot.title = element_text(hjust = 0.5)) +
