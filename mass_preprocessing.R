@@ -58,6 +58,17 @@ mass_shootings %<>% mutate(race = as.factor(race)) %>% mutate(race = fct_collaps
 
 levels(mass_shootings$race)
 
+## Preprocessing for value boxes
 
+summary <- base::summary
 
+# Precent gender
 
+percent_gender <- mass_shootings %>% group_by(gender) %>% summarise(count = n()) %>% 
+        mutate(percent = (count/sum(count))*100)
+
+percent_gender %>% filter(gender == "Female") %>% .$percent
+
+# Precent race
+
+mass_shootings %>% group_by(race) %>% summarise(count = n()) %>% mutate(percent = count/sum(count))

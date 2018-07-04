@@ -5,6 +5,10 @@ library(tidyverse)
 library(googlesheets)
 library(magrittr)
 library(plotly)
+library(conflicted)
+
+
+filter <- dplyr::filter # resolves filter-function conflict
 
 # register googlesheet from "Mother Jones - Mass Shootings Database 1982 - 2018
 
@@ -51,7 +55,8 @@ mass_shootings %<>% mutate(gender = fct_collapse(gender, Male = c("M", "Male")))
 mass_shootings %<>% mutate(race = as.factor(race)) %>% mutate(race = fct_collapse(race, White = c("White", "white"), Black = c("Black", "black"), Unclear = c("-", "unclear")))
 
 
-## Plot options
+# Plotly map - options ----------------------------------------------------
+
 
 g <- list(
         scope = 'usa',
@@ -73,3 +78,42 @@ m <- list(
         t = 30,
         pad = 2
 )
+
+
+# Moving average - plot processing ----------------------------------------
+
+library(lubridate)
+library(tidyquant)
+
+# Rolling mean
+mass_rolling_mean <- mass_shootings %>% 
+        tq_mutate(
+                # tq_mutate args
+                select     = total_victims,
+                mutate_fun = rollapply, 
+                # rollapply args
+                width      = 6,
+                align      = "right",
+                FUN        = mean,
+                # mean args
+                na.rm      = TRUE,
+                # tq_mutate args
+                col_rename = "roll_mean"
+        )
+
+
+
+# Number boxes ------------------------------------------------------------
+
+## Preprocessing for value boxes
+
+summary <- base::summary
+
+# Precent gender
+
+percent_gender <- mass_shootings %>% group_by(gender) %>% summarise(count = n()) %>% 
+        mutate(percent = (count/sum(count))*100)
+
+# Precent race
+
+mass_shootings %>% group_by(race) %>% summarise(count = n()) %>% mutate(percent = count/sum(count))
