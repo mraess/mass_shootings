@@ -10,15 +10,11 @@ mass_shootings$summary
 
 ## Regex pattern to detect names and potential middle names (M. or full name) - acounts for del, -, III, Mc, etc
 
-pattern <- "(?<!the )[A-Z][a-z]+ [A-Z]?[']?[A-Z][a-z]+ [A-Z][a-z]+\\, |^[A-Z|a-z]+ ([A-Z]\\.? )?[A-Z][a-z]+\\, |^[A-Z][a-z]+ [A-Z][a-z]+ (del)? [A-Z][a-z]+\\,? | [A-Z|a-z]+ ([A-Z]\\.? )?[A-Z][a-z]+\\, " # perl=TRUE
-
-pattern2 <- " [A-Z|a-z]+ [A-Z][a-z]+ III\\, | [A-Z|a-z]+ Mc[A-Z][a-z]+\\, | [A-Z][a-z]+\\-[A-Z][a-z]+ [A-Z][a-z]+\\," # perl=TRUE
-
 name_pattern <- "(?<!the )[A-Z][a-z]+ [A-Z]?[']?[A-Z][a-z]+ [A-Z][a-z]+\\, |^[A-Z|a-z]+ ([A-Z]\\.? )?[A-Z][a-z]+\\, |^[A-Z][a-z]+ [A-Z][a-z]+ (del)? [A-Z][a-z]+\\,? |[A-Z|a-z]+ ([A-Z]\\.? )?[A-Z][a-z]+\\, |[A-Z|a-z]+ [A-Z][a-z]+ III\\, |[A-Z|a-z]+ Mc[A-Z][a-z]+\\, |[A-Z][a-z]+\\-[A-Z][a-z]+ [A-Z][a-z]+\\, |[A-Z][a-z]+ [A-Z][a-z]+ [A-Z][a-z]+\\,? " # perl=TRUE
 
 names <- str_extract_all(mass_shootings$summary, pattern = name_pattern)
 
-## Entry 61 has a weird character in it - manual entry Sulejman Talović
+## Entry 61 has a weird character in it - manual entry Sulejman Talović grepl(mass_shootings$summary, pattern = "\U{0107}")
 
 names[61] <- "Sulejman Talović"
 
@@ -53,16 +49,16 @@ mass_shootings %<>% mutate(summary_clean = str_replace_all(summary_clean, patter
 library(stringr); library(tidytext); library(stringi)
 
 
-diaries_sentences <- diaries_combined %>% unnest_tokens(output = sentence, input = text, token = "sentences")
+sentences <- mass_shootings %>% unnest_tokens(output = sentence, input = summary_clean, token = "sentences")
 
-str(diaries_sentences)
+str(sentences)
 
-diaries_sentences <- diaries_sentences %>% group_by(part_id) %>% mutate(linenumber = row_number()) %>% ungroup
+mass_sentences <- sentences %>% group_by(year) %>% mutate(linenumber = row_number()) %>% ungroup
 
 
 ## Creating tidy text one row per word data frame
 
-tidy_diaries <- diaries_sentences %>% unnest_tokens(output = word, input = sentence)
+tidy_mass <- mass_sentences %>% unnest_tokens(output = word, input = sentence)
 
 
 data("stop_words")
@@ -73,74 +69,74 @@ library(tm)
 
 new_stops <- bind_rows(data.frame(word = stopwords("en"), lexicon = c("custom")), stop_words)
 
-tidy_diaries <- tidy_diaries %>% anti_join(new_stops)
+tidy_mass <- tidy_mass %>% anti_join(new_stops)
 
-tidy_diaries %>% count(word, sort = TRUE) %>% filter(n > 100) %>% mutate(word = reorder(word, n)) %>% 
-        ggplot(aes(word, n)) + geom_col() + xlab(NULL) + coord_flip()
-
-## Remove numbers
-
-diaries_combined[,4] <- gsub('[[:digit:]]+', '', diaries_combined[,4])
-
-## Split in sentences again
-
-diaries_sentences <- diaries_combined %>% unnest_tokens(output = sentence, input = text, token = "sentences")
-
-
-diaries_sentences <- diaries_sentences %>% group_by(part_id, diary_num) %>% mutate(linenumber = row_number()) %>% ungroup
-
-saveRDS(diaries_sentences, file = "diaries_sentences.rds")
-
-## Make tidy diaries with line numbers
-
-tidy_diaries <- diaries_sentences %>% unnest_tokens(word, sentence)
-
-tidy_diaries <- tidy_diaries %>% anti_join(new_stops)
-
-tidy_diaries %>% count(word, sort = TRUE) %>% filter(n > 100) %>% mutate(word = reorder(word, n)) %>% 
+tidy_mass %>% count(word, sort = TRUE) %>% filter(n > 10) %>% mutate(word = reorder(word, n)) %>% 
         ggplot(aes(word, n)) + geom_col() + xlab(NULL) + coord_flip()
 
 
-## Remove words like it's i'm, don't
 
-new_stops2 <- bind_rows(data.frame(word = c("it’s", "i’m", "I’m", "i’ve", "i’ll", "c’s", "she’s", "he’s", "don’t"), 
-                                   lexicon = c("custom")), new_stops)
-
-
-tidy_diaries <- tidy_diaries %>% anti_join(new_stops2)
-
-tidy_diaries %>% count(word, sort = TRUE) %>% filter(n > 30) %>% mutate(word = reorder(word, n)) %>% 
+tidy_mass %>% count(word, sort = TRUE) %>% filter(n > 5) %>% mutate(word = reorder(word, n)) %>% 
         ggplot(aes(word, n, fill = n)) + geom_col() + xlab(NULL) + coord_flip() + 
-        scale_fill_gradient(guide = FALSE, low = "blue", high = "red")
+        scale_fill_gradient(guide = FALSE, low = "#E68415", high = "#C94024") +
+        theme_tufte() +
+        theme(plot.title = element_text(hjust = 0.5), axis.title = element_text(size = 14), axis.text = element_text(size = 13)) +
+        ggtitle("Most frequent words in summary") +
+        labs(y = "Count")
 
 
-tidy_diaries %>% count(word, age_range, sex, date_created, sort = TRUE) %>% filter(n > 30, age_range %in% c("20-30", "30-40")) %>% 
-        mutate(word = reorder(word, n)) %>% 
-        ggplot(aes(word, n, fill = n)) + geom_col() + xlab(NULL) + coord_flip() + 
-        scale_fill_gradient(guide = FALSE, low = "blue", high = "red") + 
-        facet_grid(sex~date_created, scales = "free")
-
-setwd("./dsl_elm_app/data")
-saveRDS(object = tidy_diaries, file = "tidy_diaries.rds")
+# Psychological descriptions ----------------------------------------------
 
 
-stop_no_day_time <- bind_rows(data.frame(word = c("time", "day", "pm"), 
-                                         lexicon = c("custom")), new_stops2)
+## Normalize and clean text
 
-tidy_diaries_no_daytime <- tidy_diaries %>% anti_join(stop_no_day_time)
+# Remove white space in the beginning and end
 
-saveRDS(tidy_diaries_no_daytime, file = "tidy_diaries_no_daytime.rds")
+mass_shootings %<>% mutate(mental_health_clean = str_replace(mental_health_details, pattern = "(^[:space:]?)", replacement = ""))
+
+mass_shootings %<>% mutate(mental_health_clean = str_replace(mental_health_clean, pattern = "([:space:]?$)", replacement = ""))
 
 
-tidy_diaries_no_daytime %>% count(word, sort = TRUE) %>% filter(n > 50) %>% mutate(word = reorder(word, n)) %>% 
-        ggplot(aes(word, n, fill = n)) + geom_col() + xlab(NULL) + coord_flip() + 
-        scale_fill_gradient(guide = FALSE, low = "blue", high = "red")
+mass_shootings %<>% mutate(mental_health_clean = gsub("\r?\n|\r", " ", mental_health_clean))  # get rid of line brakes
 
-setwd("./dsl_elm_app/data")
 
-saveRDS(object = tidy_diaries_no_daytime, file = "tidy_diaries_no_daytime.rds")
+mass_shootings %<>% mutate(mental_health_clean = str_replace_all(mental_health_clean, pattern = "([:space:]+)", replacement = " "))
 
-setwd("../..") # move back two directories
+## Split into sentences
+
+sentences_health <- mass_shootings %>% unnest_tokens(output = sentence, input = mental_health_clean, token = "sentences")
+
+
+mass_sentences_health <- sentences_health %>% group_by(year) %>% mutate(linenumber = row_number()) %>% ungroup
+
+
+## Creating tidy text one row per word data frame
+
+tidy_mass_health <- mass_sentences_health %>% unnest_tokens(output = word, input = sentence)
+
+
+## Removing stop words
+
+tidy_mass_health <- tidy_mass_health %>% anti_join(new_stops)
+
+tidy_mass_health %>% count(word, sort = TRUE) %>% filter(n > 5) %>% mutate(word = reorder(word, n)) %>% 
+        ggplot(aes(word, n, fill = n)) + geom_col() + xlab(NULL) + coord_flip() +
+        scale_fill_gradient(guide = FALSE, low = "#E68415", high = "#C94024") +
+        theme_tufte() +
+        theme(plot.title = element_text(hjust = 0.5), axis.title = element_text(size = 14), axis.text = element_text(size = 13)) +
+        ggtitle("Most frequent words in details about psychological health") +
+        labs(y = "Count")
+
+
+
+## Correlations
+
+
+
+## TFID weighting
+
+
+
 
 # Topic modeling ----------------------------------------------------------
 

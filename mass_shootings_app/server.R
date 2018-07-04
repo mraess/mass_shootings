@@ -22,11 +22,11 @@ shinyServer(function(input, output) {
     
           plot_geo(mass_shootings, sizes = c(1,250)) %>%
                   add_markers(
-                          x = ~longitude, y = ~latitude, color = ~total_victims, size = ~total_victims, colors=c("#E68415", "#C94024"), hoverinfo = "text",
-                          text = ~paste("<b>", mass_shootings$case, "</b>", "<br>", "Location:", location, "Gender: ", gender, "<br>" , "<b>", "Total victims: " , total_victims, "</b>", "Fatalities: " , fatalities, "Injured: " , injured),
+                          x = ~longitude, y = ~latitude, color = ~fatalities, size = ~total_victims, colors=c("#E68415", "#C94024"), hoverinfo = "text",
+                          text = ~paste("<b>", mass_shootings$case, "</b>", "<br>", "Location:", location, "Gender: ", gender, "<br>" , "Total victims: " , total_victims, "<b>", "Fatalities: " , fatalities, "</b>", "Injured: " , injured),
                           symbol = I("circle")
                   ) %>%
-                  colorbar(title = "Total victims") %>% 
+                  colorbar(title = "Fatalities") %>% 
                   plotly::layout( 
                          geo = g, margin = m, mapbox = list(
                                  zoom = 100))
@@ -56,5 +56,29 @@ shinyServer(function(input, output) {
           
   },options = list(scrollX = FALSE, pageLength = 10, lengthMenu = list(c(5, 15, 25), list("5", "15", "25")))
   )
+  
+  output$plot3 <- renderPlot({
+          
+          
+          tidy_mass %>% count(word, sort = TRUE) %>% filter(n > 10) %>% mutate(word = reorder(word, n)) %>% 
+                  ggplot(aes(word, n, fill = n)) + geom_col() + xlab(NULL) + coord_flip() + 
+                  scale_fill_gradient(guide = FALSE, low = "#E68415", high = "#C94024") +
+                  theme_tufte() +
+                  theme(plot.title = element_text(hjust = 0.5), axis.title = element_text(size = 14), axis.text = element_text(size = 13)) +
+                  labs(y = "Count")
+          
+
+  })
+  
+  output$plot4 <- renderPlot({
+          
+          tidy_mass_health %>% count(word, sort = TRUE) %>% filter(n > 5) %>% mutate(word = reorder(word, n)) %>% 
+                  ggplot(aes(word, n, fill = n)) + geom_col() + xlab(NULL) + coord_flip() +
+                  scale_fill_gradient(guide = FALSE, low = "#E68415", high = "#C94024") +
+                  theme_tufte() +
+                  theme(plot.title = element_text(hjust = 0.5), axis.title = element_text(size = 14), axis.text = element_text(size = 13)) +
+                  labs(y = "Count")
+          
+  })
   
 })

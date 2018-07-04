@@ -19,7 +19,7 @@ ui <- material_page(
                         icons = c("my_location", "line_style")
                 )
         ),
-        # Define side-nav tab content
+        # Define side-nav tab content for nav1
         material_side_nav_tab_content(
                 side_nav_tab_id = "nav1",
                 tags$br(),
@@ -70,4 +70,47 @@ ui <- material_page(
                         
                 )
 
-))
+),
+material_side_nav_tab_content(
+        side_nav_tab_id = "nav2",
+        tags$br(),
+        
+        
+        material_row(
+                material_column(
+                        width = 12,
+                        material_card(
+                                title = "Most frequent words: Summary of incident",
+                                plotOutput("plot3"),
+                                depth = 2
+                        )
+                )
+        ),
+        
+        material_row(
+                material_column(
+                        width = 12,
+                        material_card(
+                                title = "Most frequent words: Psychological description",
+                                plotOutput("plot4"),
+                                depth = 2
+                        )
+                )
+        ),
+        
+        material_row(
+                material_column(
+                        width = 6,
+                        tags$a(
+                                target = "_blank",
+                                class = "btn blue",
+                                href = "https://github.com/mraess/mass_shootings",
+                                "APP CODE"
+                        )
+                )
+                
+        )
+        
+)
+
+)
