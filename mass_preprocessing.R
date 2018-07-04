@@ -65,73 +65,22 @@ g <- list(
         scope = 'usa',
         projection = list(type = 'albers usa'),
         showland = TRUE,
-        landcolor = toRGB("gray85"),
+        landcolor = toRGB("darkgrey23"),
         subunitwidth = 1,
         countrywidth = 1,
         subunitcolor = toRGB("white"),
-        countrycolor = toRGB("white")
+        countrycolor = toRGB("white"),
+        lakecolor = toRGB("blue")
 )
 
-plot_geo(mass_shootings, locationmode = 'USA-states', sizes = c(8, 250)) %>%
+plot_geo(mass_shootings, sizes = c(1,250)) %>%
         add_markers(
-                x = ~longitude, y = ~latitude, size = ~total_victims, color = ~gender, hoverinfo = "text",
-                text = ~paste(mass_shootings$case, paste0("<b>","<i>",gender,"<i>", "      
-                                                        </b>"), "Location:", location, total_victims, fatalities, injured)
+                x = ~longitude, y = ~latitude, color = ~total_victims, size = ~total_victims, colors=c("orange", "red"), hoverinfo = "text",
+                text = ~paste("<b>", mass_shootings$case, "</b>", "<br>", "Location:", location, "Gender: ", gender, "<br>" , "<b>", "Total victims: " , total_victims, "</b>", "Fatalities: " , fatalities, "Injured: " , injured),
+                symbol = I("square")
         ) %>%
-        layout(title = 'Mass shootings 1982 - 2018<br>(Click legend to toggle)', geo = g)
+        colorbar(title = "Total victims") %>% 
+        layout(title = 'Mass shootings 1982 - 2018', 
+               geo = g)
 
 
-## Plotting with leaflet
-library(leaflet)
-
-## Make custom Twitter icons
-
-# red = https://www.iconfinder.com/icons/738405/media_online_social_twitter_icon#size=128
-# blue = https://www.iconfinder.com/icons/1233015/twitter_icon#size=128
-
-twitterIconBlue <- makeIcon(
-        iconUrl = "twitter_blue.png",
-        iconWidth = 24,
-        iconHeight = 24,
-        iconAnchorX = 31*215/230/2, iconAnchorY = 16
-)
-
-twitterIconRed <- makeIcon(
-        iconUrl = "twitter_red.png",
-        iconWidth = 24,
-        iconHeight = 24,
-        iconAnchorX = 31*215/230/2, iconAnchorY = 16
-)
-
-## Adding popup-info to data frame
-
-diss_part2 <- diss_part %>% mutate(gender = fct_recode(gender, "Female" = "female",
-                                                       "Male" = "male")) %>% 
-        mutate(popup_info = paste(sep = "<br/>", paste0("<b>","<i>",gender,"<i>", "      
-                                                        </b>"), city, edu, edu2, tweet_num))
-
-## Plotting the map
-
-twitterIcons <- iconList(Male = twitterIconBlue, Female = twitterIconRed)
-
-
-
-leaflet(mass_shootings) %>%
-        addTiles() %>% 
-        addMarkers(lng = ~longitude, 
-                   lat = ~latitude,
-                   popup = ~paste(mass_shootings$case), clusterOptions = markerClusterOptions())
-
-# Alternative
-
-leaflet(mass_shootings) %>%
-        addProviderTiles(provider = providers$Esri.WorldStreetMap,
-                         options = tileOptions(minZoom=2)) %>% 
-        addMarkers(lng = ~longitude, 
-                   lat = ~latitude,
-                   popup = ~paste(mass_shootings$case, sep = "<br/>", paste0("<b>","<i>",gender,"<i>", "      
-                                                        </b>"), "Location:", location, total_victims, fatalities, injured), clusterOptions = markerClusterOptions())
-
-
-leaflet() %>% 
-        addProviderTiles("Stamen.Watercolor")
