@@ -1,6 +1,6 @@
 
 library(shinymaterial)
-library(shinymaterial)
+
 
 # Wrap shinymaterial apps in material_page
 ui <- material_page(

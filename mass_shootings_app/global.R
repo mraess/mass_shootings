@@ -9,6 +9,7 @@ library(conflicted)
 
 
 filter <- dplyr::filter # resolves filter-function conflict
+as.Date <- base::as.Date
 
 # register googlesheet from "Mother Jones - Mass Shootings Database 1982 - 2018
 
