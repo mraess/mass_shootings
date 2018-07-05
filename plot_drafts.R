@@ -25,13 +25,15 @@ m <- list(
         pad = 2
 )
 
-plot_geo(mass_shootings, sizes = c(1,250)) %>%
+gen_mass <- mass_shootings %>% filter(gender == "Male")
+
+plot_geo(gen_mass, sizes = c(1,250)) %>%
         add_markers(
-                x = ~longitude, y = ~latitude, color = ~fatalities, size = ~total_victims, colors=c("#E68415", "#C94024"), hoverinfo = "text",
-                text = ~paste("<b>", mass_shootings$case, "</b>", "<br>", "Location:", location, "Gender: ", gender, "<br>" , "<b>", "Total victims: " , total_victims, "</b>", "Fatalities: " , fatalities, "Injured: " , injured),
+                x = ~longitude, y = ~latitude, color = ~fatalities, size = ~fatalities, colors=c("#E68415", "#C94024"), hoverinfo = "text",
+                text = ~paste("<b>", case,";", "</b>", "<br>", "Location:", location,";", "Name: " , name, ";", "Gender: ", gender, ";", "<br>" , "<b>", "Total victims: " , total_victims, ";", "</b>", "Fatalities: " , fatalities, ";", "Injured: " , injured),
                 symbol = I("circle")
         ) %>%
-        colorbar(title = "Total victims") %>% 
-        layout(title = 'US Mass Shootings 1982 - 2018', 
+        colorbar(title = "Fatalities") %>% 
+        plotly::layout(title = 'US Mass Shootings 1982 - 2018', 
                geo = g, margin = m, mapbox = list(
                        zoom = 100))

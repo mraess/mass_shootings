@@ -19,27 +19,43 @@ library(plotly)
 shinyServer(function(input, output) {
    
   output$plotly1 <- renderPlotly({
-    
-          plot_geo(mass_shootings, sizes = c(1,250)) %>%
-                  add_markers(
-                          x = ~longitude, y = ~latitude, color = ~fatalities, size = ~total_victims, colors=c("#E68415", "#C94024"), hoverinfo = "text",
-                          text = ~paste("<b>", mass_shootings$case, "</b>", "<br>", "Location:", location, "Gender: ", gender, "<br>" , "Total victims: " , total_victims, "<b>", "Fatalities: " , fatalities, "</b>", "Injured: " , injured),
-                          symbol = I("circle")
-                  ) %>%
-                  colorbar(title = "Fatalities") %>% 
-                  plotly::layout( 
-                         geo = g, margin = m, mapbox = list(
-                                 zoom = 100))
+          
+          gen_select <- switch(input$gender_select,
+                               Male = "Male",
+                               Female = "Female",
+                               Both = "Male & Female",
+                               All = c("Male", "Female", "Male & Female"))
+          
+        mass_shootings %>% filter(gender %in% gen_select) %>% 
+          
+        plot_geo(sizes = c(1,250)) %>%
+                add_markers(
+                        x = ~longitude, y = ~latitude, color = ~fatalities, size = ~fatalities, colors=c("#E68415", "#C94024"), hoverinfo = "text",
+                        text = ~paste("<b>", case,";", "</b>", "<br>", "Location:", location,";", "Name: " , name, ";", "Gender: ", gender, ";", "<br>" , "<b>", "Total victims: " , total_victims, ";", "</b>", "Fatalities: " , fatalities, ";", "Injured: " , injured),
+                        symbol = I("circle")
+                ) %>%
+                colorbar(title = "Fatalities") %>% 
+                plotly::layout(title = 'US Mass Shootings 1982 - 2018', 
+                               geo = g, margin = m, mapbox = list(
+                                       zoom = 100))
 
     
   })
   
   output$plot2 <- renderPlot({
           
-          mass_rolling_mean %>%
-                  ggplot(aes(x = date, y = total_victims)) +
+          gen_select <- switch(input$gender_select,
+                               Male = "Male",
+                               Female = "Female",
+                               Both = "Male & Female",
+                               All = c("Male", "Female", "Male & Female"))
+          
+          gen_mass <- mass_rolling_mean %>% filter(gender %in% gen_select)
+          
+          
+                  ggplot(gen_mass, aes(x = date, y = total_victims)) +
                   # Data
-                  geom_point(alpha = 0.8, color = ifelse(mass_rolling_mean$total_victims < 200,"#E68415", "#C94024"), size = 2.5) +
+                  geom_point(alpha = 0.8, color = ifelse(gen_mass$total_victims < 200,"#E68415", "#C94024"), size = 2.5) +
                   geom_line(aes(y = roll_mean), color = palette_light()[[1]], size = 1.2, alpha = .85) +
                   scale_x_date(date_breaks = "2 years", date_labels =  "%Y") +
                   theme_tufte() +

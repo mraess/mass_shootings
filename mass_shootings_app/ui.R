@@ -24,6 +24,16 @@ ui <- material_page(
                 side_nav_tab_id = "nav1",
                 tags$br(),
                 
+                material_row(
+                             material_column(width = 3,
+                                             material_dropdown(
+                                                     input_id = "gender_select",
+                                                     label = "Select gender:",
+                                                     choices = c("All", "Both", "Male", "Female"),
+                                                     selected = "All",
+                                                     multiple = FALSE,
+                                                     color = "#3949ab"
+                                             ))),
 
                 material_row(
                                 material_column(
