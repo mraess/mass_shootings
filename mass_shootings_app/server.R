@@ -31,7 +31,7 @@ shinyServer(function(input, output) {
         plot_geo(sizes = c(1,250)) %>%
                 add_markers(
                         x = ~longitude, y = ~latitude, color = ~fatalities, size = ~fatalities, colors=c("#E68415", "#C94024"), hoverinfo = "text",
-                        text = ~paste("<b>", case,";", "</b>", "<br>", "Location:", location,";", "Name: " , name, ";", "Gender: ", gender, ";", "<br>" , "<b>", "Total victims: " , total_victims, ";", "</b>", "Fatalities: " , fatalities, ";", "Injured: " , injured),
+                        text = ~paste("<b>", case,";", "</b>", "Year:", year, "<br>", "Location:", location,";", "Name: " , name, ";", "Gender: ", gender, ";", "<br>" , "<b>", "Total victims: " , total_victims, ";", "</b>", "Fatalities: " , fatalities, ";", "Injured: " , injured),
                         symbol = I("circle")
                 ) %>%
                 colorbar(title = "Fatalities") %>% 
