@@ -33,10 +33,11 @@ shinyServer(function(input, output) {
           
         gen_mass <- mass_shootings %>% filter(gender %in% gen_select) %>% 
                 filter(year >= input$from_year, year <= input$to_year)
+        
           
         plot_geo(gen_mass, sizes = c(1, 250)) %>%
                 add_markers(
-                        x = ~longitude, y = ~latitude, color = ~gen_mass[[coloring_size]], size = ~gen_mass[[coloring_size]], colors=c("#E68415", "#C94024"), hoverinfo = "text",
+                        x = ~longitude, y = ~latitude, color = ~gen_mass[[coloring_size]], size = ~gen_mass[[coloring_size]], colors=c("#E68415", "#C94024"), hoverinfo = "text", key = ~key,
                         text = ~paste("<b>", case,";", "</b>", "Year:", year, "<br>", "Location:", location,";", "Name: " , name, ";", "Gender: ", gender, ";", "<br>" , "<b>", "Total victims: " , total_victims, ";", "</b>", "Fatalities: " , fatalities, ";", "Injured: " , injured),
                         symbol = I("circle")
                 ) %>%
@@ -44,8 +45,17 @@ shinyServer(function(input, output) {
                 plotly::layout( 
                                geo = g, margin = m, mapbox = list(
                                        zoom = 100))
+        
+
 
     
+  })
+  
+  output$brush <- renderPrint({
+          d <- event_data("plotly_selected")
+
+          if (is.null(d)) {"Click and drag events (i.e., box-select/lasso) appear here (double-click to clear)"}
+          else mass_shootings %>% filter(key %in% d$key) %>% select(name, weapons_obtained_legally, weapon_details)
   })
   
   output$plot2 <- renderPlot({
@@ -72,12 +82,7 @@ shinyServer(function(input, output) {
           
   })
   
-  output$table1 <- renderDataTable({
-          
-          mass_shootings %>% select(case, location, date, gender, age_of_shooter, race, weapon_details, weapons_obtained_legally, prior_signs_of_mental_health_issues)
-          
-  },options = list(scrollX = FALSE, pageLength = 10, lengthMenu = list(c(5, 15, 25), list("5", "15", "25")))
-  )
+
   
   output$plot3 <- renderPlot({
           

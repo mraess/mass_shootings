@@ -27,8 +27,10 @@ m <- list(
 
 gen_mass <- mass_shootings %>% filter(gender == "Male")
 
+ar_15 <- mass_shootings %>% filter(prior_signs_of_mental_health_issues == "Yes")
 
-plot_geo(gen_mass, sizes = c(1,250)) %>%
+
+m1 <- plot_geo(gen_mass, sizes = c(1,250)) %>%
         add_markers(
                 x = ~longitude, y = ~latitude, color = ~gen_mass$fatalities, size = ~gen_mass$fatalities, colors=c("#E68415", "#C94024"), hoverinfo = "text",
                 text = ~paste("<b>", case,";", "</b>", "<br>", "Location:", location,";", "Name: " , name, ";", "Gender: ", gender, ";", "<br>" , "<b>", "Total victims: " , total_victims, ";", "</b>", "Fatalities: " , fatalities, ";", "Injured: " , injured),
@@ -38,6 +40,19 @@ plot_geo(gen_mass, sizes = c(1,250)) %>%
         plotly::layout(title = 'US Mass Shootings 1982 - 2018', 
                geo = g, margin = m, mapbox = list(
                        zoom = 100))
+
+
+m2 <- plot_geo(ar_15, sizes = c(1,250)) %>%
+        add_markers(
+                x = ~longitude, y = ~latitude,
+                symbol = I("square")
+        ) %>%
+        plotly::layout( 
+                       geo = g, margin = m, mapbox = list(
+                               zoom = 100))
+
+subplot(m1, m2, nrows = 2)
+
 
 mass_shootings %>% gather(key = "kind", value = "count", fatalities, injured, total_victims) %>% 
 

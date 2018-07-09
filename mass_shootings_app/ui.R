@@ -73,22 +73,24 @@ ui <- material_page(
                         material_column(
                                 width = 12,
                                 material_card(
+                                        title = "More Details",
+                                        verbatimTextOutput("brush"),
+                                        depth = 2
+                                )
+                        )
+                ),
+                
+                material_row(
+                        material_column(
+                                width = 12,
+                                material_card(
                                         title = "Moving average of total victims",
                                         plotOutput("plot2"),
                                         depth = 2
                                 )
                         )
                 ),
-                material_row(
-                        material_column(
-                                width = 12,
-                                material_card(
-                                        title = "Table view",
-                                        dataTableOutput("table1"),
-                                        depth = 2
-                                )
-                        )
-                ),
+
                 
                 material_row(
                         material_column(

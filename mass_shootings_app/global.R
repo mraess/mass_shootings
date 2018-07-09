@@ -7,7 +7,7 @@ library(magrittr)
 library(plotly)
 library(conflicted)
 library(ggthemes)
-library(stringr); library(tidytext); library(stringi)
+library(stringr); library(stringi)
 library(tidytext)
 library(tm)
 
@@ -60,6 +60,10 @@ mass_shootings %<>% mutate(gender = fct_collapse(gender, Male = c("M", "Male")))
 mass_shootings %<>% mutate(race = as.factor(race)) %>% mutate(race = fct_collapse(race, White = c("White", "white"), Black = c("Black", "black"), Unclear = c("-", "unclear")))
 
 
+## Add key variable for plotting
+
+mass_shootings %<>% mutate(key = row.names(mass_shootings))
+
 # Plotly map - options ----------------------------------------------------
 
 
@@ -83,6 +87,7 @@ m <- list(
         t = 30,
         pad = 2
 )
+
 
 
 # Moving average - plot processing ----------------------------------------
