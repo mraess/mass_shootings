@@ -28,11 +28,34 @@ ui <- material_page(
                              material_column(width = 3,
                                              material_dropdown(
                                                      input_id = "gender_select",
-                                                     label = "Select gender:",
+                                                     label = "Gender: ",
                                                      choices = c("All", "Both", "Male", "Female"),
                                                      selected = "All",
                                                      multiple = FALSE,
                                                      color = "#3949ab"
+                                             )),
+                             
+                             material_column(width = 3,
+                                             material_slider(input_id = "from_year", 
+                                                             label = "From year: ", 
+                                                             min_value = min(mass_shootings$year), 
+                                                             max_value = max(mass_shootings$year) - 1, 
+                                                             initial_value = min(mass_shootings$year), 
+                                                             color = "red"
+                                             )),
+                             material_column(width = 3,
+                                             material_slider(input_id = "to_year", 
+                                                             label = "To year: ", 
+                                                             min_value = min(mass_shootings$year) + 1, 
+                                                             max_value = max(mass_shootings$year), 
+                                                             initial_value = max(mass_shootings$year), 
+                                                             color = "red"
+                                             )),
+                             material_column(width = 3,
+                                             material_radio_button(input_id = "coloring_size", 
+                                                             label = "Coloring and size: ", 
+                                                             choices = c("Fatalities", "Injured", "TotalVictims"), 
+                                                             color = "red"
                                              ))),
 
                 material_row(

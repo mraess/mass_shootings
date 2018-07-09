@@ -67,7 +67,7 @@ g <- list(
         scope = 'usa',
         projection = list(type = 'albers usa'),
         showland = TRUE,
-        landcolor = toRGB("#4F2F2F"),
+        landcolor = toRGB("#8C96B3"),
         subunitwidth = 1,
         countrywidth = 1,
         subunitcolor = toRGB("white"),

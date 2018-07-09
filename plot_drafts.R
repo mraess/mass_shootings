@@ -27,13 +27,22 @@ m <- list(
 
 gen_mass <- mass_shootings %>% filter(gender == "Male")
 
+
 plot_geo(gen_mass, sizes = c(1,250)) %>%
         add_markers(
-                x = ~longitude, y = ~latitude, color = ~fatalities, size = ~fatalities, colors=c("#E68415", "#C94024"), hoverinfo = "text",
+                x = ~longitude, y = ~latitude, color = ~gen_mass$fatalities, size = ~gen_mass$fatalities, colors=c("#E68415", "#C94024"), hoverinfo = "text",
                 text = ~paste("<b>", case,";", "</b>", "<br>", "Location:", location,";", "Name: " , name, ";", "Gender: ", gender, ";", "<br>" , "<b>", "Total victims: " , total_victims, ";", "</b>", "Fatalities: " , fatalities, ";", "Injured: " , injured),
                 symbol = I("circle")
         ) %>%
-        colorbar(title = "Fatalities") %>% 
+        colorbar(title = str_to_title(gen_mass$fatalities)) %>% 
         plotly::layout(title = 'US Mass Shootings 1982 - 2018', 
                geo = g, margin = m, mapbox = list(
                        zoom = 100))
+
+mass_shootings %>% gather(key = "kind", value = "count", fatalities, injured, total_victims) %>% 
+
+ggplot(aes(x = year, y = count, fill = kind)) + geom_bar(stat = "identity", position = "dodge") + 
+        theme_tufte()
+
+mass_shootings$type_of_weapons
+

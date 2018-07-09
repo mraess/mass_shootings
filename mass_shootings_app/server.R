@@ -26,16 +26,22 @@ shinyServer(function(input, output) {
                                Both = "Male & Female",
                                All = c("Male", "Female", "Male & Female"))
           
-        mass_shootings %>% filter(gender %in% gen_select) %>% 
+          coloring_size <- switch(input$coloring_size,
+                               Fatalities = "fatalities",
+                               Injured = "injured",
+                               TotalVictims = "total_victims")
           
-        plot_geo(sizes = c(1,250)) %>%
+        gen_mass <- mass_shootings %>% filter(gender %in% gen_select) %>% 
+                filter(year >= input$from_year, year <= input$to_year)
+          
+        plot_geo(gen_mass, sizes = c(1, 250)) %>%
                 add_markers(
-                        x = ~longitude, y = ~latitude, color = ~fatalities, size = ~fatalities, colors=c("#E68415", "#C94024"), hoverinfo = "text",
+                        x = ~longitude, y = ~latitude, color = ~gen_mass[[coloring_size]], size = ~gen_mass[[coloring_size]], colors=c("#E68415", "#C94024"), hoverinfo = "text",
                         text = ~paste("<b>", case,";", "</b>", "Year:", year, "<br>", "Location:", location,";", "Name: " , name, ";", "Gender: ", gender, ";", "<br>" , "<b>", "Total victims: " , total_victims, ";", "</b>", "Fatalities: " , fatalities, ";", "Injured: " , injured),
                         symbol = I("circle")
                 ) %>%
-                colorbar(title = "Fatalities") %>% 
-                plotly::layout(title = 'US Mass Shootings 1982 - 2018', 
+                colorbar(title = str_to_title(coloring_size)) %>% 
+                plotly::layout( 
                                geo = g, margin = m, mapbox = list(
                                        zoom = 100))
 

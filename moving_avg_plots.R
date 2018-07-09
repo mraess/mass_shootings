@@ -47,7 +47,7 @@ mass_rolling_mean %>%
         theme(plot.title = element_text(hjust = 0.5)) +
         ggtitle("Moving average of total victims") +
         labs(y = "Total victims", x = "Year") +
-        coord_cartesian(xlim = c(date("1982-01-01"), date("2019-01-01")), ylim = c(0, 600))
+        coord_cartesian(xlim = c(lubridate::date("1982-01-01"), lubridate::date("2019-01-01")), ylim = c(0, 600))
 
 
 savings %>%
