@@ -24,7 +24,32 @@ mass_shootings$name <- names %>% map(1) %>% unlist()# sapply(test, function(x) x
 
 mass_shootings %<>% mutate(name = str_remove_all(name, pattern = ", $"))
 
+## Extract weapon types
 
+mass_shootings$type_of_weapons
+
+
+weapons <- str_split(mass_shootings$type_of_weapons, pattern = ";|, |and ", n = 2) %>% map(1) %>% unlist()
+
+
+weapons %<>% str_remove_all(pattern = "\\([a-z]+ ?[a-z]+\\)") %>% 
+        str_replace_all(pattern = "(?<![Ss]emiautomatic )handguns?\n?", replacement = "handgun(s)") %>%  # perl=TRUE
+str_replace_all(pattern = "[Ss]emiautomatic handgun\n?", replacement = "semiautomatic handgun(s)") %>% 
+
+str_replace_all(pattern = "[Ss]emiautomatic rifles?", replacement = "semiautomatic rifle(s)") %>% 
+        str_replace_all(pattern = "(?<![Ss]emiautomatic )rifle", replacement = "rifle(s)") %>% 
+        str_replace_all(pattern = "[Pp]istols?", replacement = "handgun(s)") %>% 
+        str_replace_all(pattern = "[Ff]irearms?", replacement = "handgun(s)") %>% 
+        str_remove_all(pattern = "One |Two |Three") %>% 
+        str_remove_all(pattern = "[[:digit:]]") %>% 
+        str_remove_all(pattern = "^[[:space:]]") %>%
+        str_remove_all(pattern = "[[:space:]]$") %>% 
+        str_remove_all(pattern = "s$")
+
+
+mass_shootings %<>% mutate(weapons = weapons)
+
+mass_shootings$weapons
 
 # Text analysis -----------------------------------------------------------
 
