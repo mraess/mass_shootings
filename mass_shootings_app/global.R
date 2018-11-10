@@ -40,7 +40,7 @@ names(mass_shootings) %<>% str_remove_all(pattern = "-|\\(|\\)") %>% str_replace
 
 ## Clean up character-type variables
 
-mass_shootings %<>% mutate(prior_signs_of_mental_health_issues = str_replace_all(prior_signs_of_mental_health_issues, pattern = "-", replacement = "TBD"), 
+mass_shootings %<>% mutate(prior_signs_mental_health_issues = str_replace_all(prior_signs_mental_health_issues, pattern = "-", replacement = "TBD"), 
                            mental_health_details =  str_replace_all(mental_health_details, pattern = "-", replacement = "TBD"),
                            weapons_obtained_legally = str_replace_all(weapons_obtained_legally, pattern = "-", replacement = "TBD"),
                            where_obtained = str_replace_all(where_obtained, pattern = "-", replacement = "TBD"),
@@ -140,9 +140,9 @@ names <- str_extract_all(mass_shootings$summary, pattern = name_pattern)
 
 ## Entry 61 has a weird character in it - manual entry Sulejman Talović grepl(mass_shootings$summary, pattern = "\U{0107}")
 
-names[61] <- "Sulejman Talović"
+names[66] <- "Sulejman Talović"
 
-mass_shootings$name <- names %>% map(1) %>% unlist()# sapply(test, function(x) x[1])
+mass_shootings %<>% mutate(name = names %>% map(1) %>% unlist()) # sapply(test, function(x) x[1])
 
 # Delete all white spaces and commas in names
 

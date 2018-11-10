@@ -16,7 +16,7 @@ library(tm)
 library(plotly)
 
 # Define server logic required to draw a histogram
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
    
   output$plotly1 <- renderPlotly({
           
@@ -51,12 +51,20 @@ shinyServer(function(input, output) {
     
   })
   
-  output$brush <- renderPrint({
+
+  
+ output$brush <- renderDataTable({
+         
           d <- event_data("plotly_selected")
 
-          if (is.null(d)) {"Click and drag events (i.e., box-select/lasso) appear here (double-click to clear)"}
+          if (is.null(d)) {tibble(What_to_do = "Click and drag events (i.e., box-select/lasso) appear here (double-click to clear)")}
+          
           else mass_shootings %>% filter(key %in% d$key) %>% select(name, weapons_obtained_legally, weapon_details)
-  })
+
+        }, options = list(pageLength = 10))
+  
+
+ 
   
   output$plot2 <- renderPlot({
           

@@ -61,3 +61,10 @@ ggplot(aes(x = year, y = count, fill = kind)) + geom_bar(stat = "identity", posi
 
 mass_shootings$type_of_weapons
 
+library(gghighlight)
+
+mass_shootings %>% group_by(year) %>% summarise(mean_age = mean(age_of_shooter)) %>% 
+        ggplot(aes(year, mean_age)) + geom_point() +  
+        scale_x_continuous(breaks = seq(1982, 2019, 2)) +
+        theme_tufte() +
+        gghighlight(mean_age < 25)

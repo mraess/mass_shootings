@@ -2,8 +2,10 @@
 library(shinymaterial)
 
 
+
 # Wrap shinymaterial apps in material_page
 ui <- material_page(
+
         title = paste(min(mass_shootings$year) ,"- ", max(mass_shootings$year) ,"US Mass Shootings"),
         nav_bar_fixed = TRUE,
         nav_bar_color = "indigo darken-1", 
@@ -21,6 +23,7 @@ ui <- material_page(
         ),
         # Define side-nav tab content for nav1
         material_side_nav_tab_content(
+                shinyjs::useShinyjs(),
                 side_nav_tab_id = "nav1",
                 tags$br(),
                 
@@ -74,11 +77,10 @@ ui <- material_page(
                                 width = 12,
                                 material_card(
                                         title = "More Details",
-                                        verbatimTextOutput("brush"),
+                                        dataTableOutput("brush"),
                                         depth = 2
                                 )
-                        )
-                ),
+                        )),
                 
                 material_row(
                         material_column(
