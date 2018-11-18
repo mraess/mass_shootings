@@ -31,7 +31,7 @@ ui <- material_page(
                              material_column(width = 3,
                                              material_dropdown(
                                                      input_id = "gender_select",
-                                                     label = "Gender: ",
+                                                     label = tags$p(fa("male", fill = "steelblue"),fa("female", fill = "pink"), "Select Gender:"),
                                                      choices = c("All", "Both", "Male", "Female"),
                                                      selected = "All",
                                                      multiple = FALSE,
@@ -77,7 +77,7 @@ ui <- material_page(
                                 width = 12,
                                 material_card(
                                         title = "More Details",
-                                        dataTableOutput("brush"),
+                                        formattableOutput("brush"),
                                         depth = 2
                                 )
                         )),

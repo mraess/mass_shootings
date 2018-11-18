@@ -14,6 +14,8 @@ library(tidytext)
 library(RColorBrewer)
 library(tm)
 library(plotly)
+library(formattable)
+library(fontawesome)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
@@ -53,15 +55,35 @@ shinyServer(function(input, output, session) {
   
 
   
- output$brush <- renderDataTable({
+ output$brush <- renderFormattable({
          
           d <- event_data("plotly_selected")
 
-          if (is.null(d)) {tibble(What_to_do = "Click and drag events (i.e., box-select/lasso) appear here (double-click to clear)")}
+          if (is.null(d)) {formattable(tibble(What_to_do = "Click and drag events (i.e., box-select/lasso) appear here (double-click to clear)"))}
           
-          else mass_shootings %>% filter(key %in% d$key) %>% select(name, weapons_obtained_legally, weapon_details)
+          else mass_shootings %>% 
+                  filter(key %in% d$key) %>% 
+                  select(name, gender, weapons_obtained_legally, weapon_details) %>% 
+                  formattable(list(weapons_obtained_legally = formatter("span", 
+                                                                        style = x ~ formattable::style(color = case_when(grepl("Yes", x) ~ "green",
+                                                                                                                         grepl("No", x) ~ "red",
+                                                                                                                         grepl("TBD", x) ~ "orange",
+                                                                                                                         TRUE ~ "blue")), 
+                                                                        x ~ icontext(case_when(grepl("Yes", x) ~ "ok-sign", 
+                                                                                               grepl("No", x) ~ "remove-sign",
+                                                                                               grepl("TBD", x) ~ "question-sign",
+                                                                                               TRUE ~ "question-sign"), 
+                                                                                     case_when(grepl("Yes", x) ~ "Yes",
+                                                                                        grepl("No", x) ~ "No",
+                                                                                        TRUE ~ "?"))), 
+                                   gender = formatter("span", style = x ~ formattable::style(color = case_when(grepl("Female", x) | grepl("F", x) ~ "pink",
+                                                                                                               grepl("Male", x) ~ "blue",
+                                                                                                                grepl("Male & Female", x) ~ "black")),
+                                                      x ~ icontext(case_when(grepl("Female", x) | grepl("F", x) ~ "user",
+                                                                             grepl("Male", x) ~ "user",
+                                                                             grepl("Male & Female", x) ~ "both")))))
 
-        }, options = list(pageLength = 10))
+        })
   
 
  
