@@ -1,6 +1,7 @@
 
 library(shinymaterial)
-
+library(fontawesome)
+library(formattable)
 
 
 # Wrap shinymaterial apps in material_page

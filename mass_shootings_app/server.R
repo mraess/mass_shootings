@@ -63,8 +63,8 @@ shinyServer(function(input, output, session) {
           
           else mass_shootings %>% 
                   filter(key %in% d$key) %>% 
-                  select(name, gender, weapons_obtained_legally, weapon_details) %>% 
-                  formattable(list(weapons_obtained_legally = formatter("span", 
+                  select(name, age, gender, weapons_obtained_legally, weapon_details) %>% 
+                  formattable(list(age = color_tile("orange", "red"), weapons_obtained_legally = formatter("span", 
                                                                         style = x ~ formattable::style(color = case_when(grepl("Yes", x) ~ "green",
                                                                                                                          grepl("No", x) ~ "red",
                                                                                                                          grepl("TBD", x) ~ "orange",

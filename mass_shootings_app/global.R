@@ -140,15 +140,25 @@ names <- str_extract_all(mass_shootings$summary, pattern = name_pattern)
 
 ## Entry 61 has a weird character in it - manual entry Sulejman Talović grepl(mass_shootings$summary, pattern = "\U{0107}")
 
-names[66] <- "Sulejman Talović"
+#names[61] <- "Sulejman Talović"
+#
 
-mass_shootings %<>% mutate(name = names %>% map(1) %>% unlist()) # sapply(test, function(x) x[1])
+## New way of dealing with empty name slot that keeps moving
+
+mass_shootings$name <- unlist(lapply(names, function(x) ifelse(is.null(x), NA, x)))
+
+#mass_shootings$name <- names %>% map(1) %>% unlist(use.names = TRUE)# sapply(test, function(x) x[1])
+#
+
 
 # Delete all white spaces and commas in names
 
 mass_shootings %<>% mutate(name = str_remove_all(name, pattern = ", $"))
 
 
+# Dealing with shooter age ------------------------------------------------
+
+mass_shootings$age <- as.numeric(mass_shootings$age_of_shooter)
 
 # Text analysis -----------------------------------------------------------
 
